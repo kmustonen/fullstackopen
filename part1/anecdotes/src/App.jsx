@@ -20,6 +20,11 @@ const App = () => {
     setSelected(Math.floor(Math.random() * (anecdotes.length - 1)))
   }
 
+  const findMaxIndex = (arr) => {
+    const maxValue = Math.max(...arr);
+    return arr.indexOf(maxValue);
+  }
+
   const handleVote = () => {
     const temp = [...votes]
     temp[selected] += 1
@@ -30,12 +35,18 @@ const App = () => {
   return (
     <div>
       <div>
+        <h2>Anecdote of the day</h2>
         {anecdotes[selected]}
         <p>has {votes[selected]} votes</p>
       </div>
       <div>
         <button onClick={handleNext}>next anecdote</button>
         <button onClick={handleVote}>vote</button>
+      </div>
+      <div>
+        <h2>Anecdote with most votes</h2>
+        {anecdotes[findMaxIndex(votes)]}
+        <p>has {votes[findMaxIndex(votes)]} votes</p>
       </div>
     </div>
   )
