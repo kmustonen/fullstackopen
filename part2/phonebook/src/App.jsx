@@ -13,7 +13,10 @@ const App = () => {
 
   const addNewPerson = (e) => {
     e.preventDefault()
-    setPersons(persons.concat({ name: newName, id: persons.length }))
+    const exists = persons.findIndex((person) => person.name === newName) !== -1
+    exists
+      ? alert(`${newName} is already added to phonebook`)
+      : setPersons(persons.concat({ name: newName, id: persons.length }))
   }
 
   return (
@@ -29,8 +32,7 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       <ul>
-        {
-          persons.map(person => <li key={person.name}> {person.name}</li>)}
+        {persons.map(person => <li key={person.name}> {person.name}</li>)}
       </ul>
     </div >
   )
