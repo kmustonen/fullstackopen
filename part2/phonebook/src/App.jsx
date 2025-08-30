@@ -1,6 +1,30 @@
 import { useState, useEffect } from 'react'
 import phonebookService from './services/phonebook'
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="notification">
+      {message}
+    </div>
+  )
+}
+
+const Error = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="error">
+      {message}
+    </div>
+  )
+}
+
 const PersonForm = ({ newPerson, addNewPerson, handleNameChange, handleNumberChange }) => {
   return (
     <form onSubmit={addNewPerson}>
@@ -30,7 +54,7 @@ const Persons = ({ persons, filterWith, handleRemove }) => {
         .filter(person => person.name.toLowerCase().includes(filterWith.toLowerCase()))
         .map(person => <li key={person.name}>
           <p>{person.name} {person.number}</p>
-          <button onClick={() => { if (confirm(`Delete ${person.name} ?`)) handleRemove(person.id) }}>delete</button>
+          <button onClick={() => { if (confirm(`Delete ${person.name} ?`)) handleRemove(person) }}>delete</button>
         </li>)}
     </ul>
   )
@@ -41,6 +65,9 @@ const App = () => {
 
   const [newPerson, setNewPerson] = useState({ name: '', number: '' })
   const [filterWith, setFilter] = useState('')
+
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     phonebookService
@@ -72,7 +99,10 @@ const App = () => {
     const id = Math.random().toString(36).substring(2, 6)
     exists
       ? (confirm(`${newPerson.name} is already added to phonebook, replace the old number with a new one`) && updatePerson(newPerson))
-      : (setPersons(persons.concat({ ...newPerson, id })), phonebookService.create({ ...newPerson, id }))
+      : (setPersons(persons.concat({ ...newPerson, id })),
+        phonebookService.create({ ...newPerson, id }),
+        setNotificationMessage(`Added ${newPerson.name}`),
+        setTimeout(() => setNotificationMessage(null), 3000))
   }
 
   const updatePerson = (newPerson) => {
@@ -81,20 +111,29 @@ const App = () => {
       .update(oldPerson.id, { ...oldPerson, number: newPerson.number })
       .then(() => {
         setPersons(persons.map(person => (person.name === newPerson.name) ? { ...person, number: newPerson.number } : person))
+        setNotificationMessage(`Updated number for ${newPerson.name}`)
+        setTimeout(() => setNotificationMessage(null), 3000)
+      }).catch(error => {
+        setErrorMessage(`Information of ${newPerson.name} has already been removed`)
+        setTimeout(() => setErrorMessage(null), 3000)
       })
   }
 
-  const handleRemove = (id) => {
+  const handleRemove = (person) => {
     phonebookService
-      .remove(id)
+      .remove(person.id)
       .then(() => {
-        setPersons(persons.filter(person => person.id !== id))
+        setPersons(persons.filter(p => p.id !== person.id))
+        setNotificationMessage(`Removed ${person.name}`)
+        setTimeout(() => setNotificationMessage(null), 3000)
       })
   }
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+      <Notification message={notificationMessage} />
+      <Error message={errorMessage} />
       <Filter filterWith={filterWith} handleFilterChange={handleFilterChange} />
       <h2>Add a new</h2>
       <PersonForm newPerson={newPerson} addNewPerson={addNewPerson} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
