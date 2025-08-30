@@ -23,12 +23,15 @@ const Filter = ({ filterWith, handleFilterChange }) => {
   )
 }
 
-const Persons = ({ persons, filterWith }) => {
+const Persons = ({ persons, filterWith, handleRemove }) => {
   return (
     <ul>
       {persons
         .filter(person => person.name.toLowerCase().includes(filterWith.toLowerCase()))
-        .map(person => <li key={person.name}>{person.name} {person.number}</li>)}
+        .map(person => <li key={person.name}>
+          <p>{person.name} {person.number}</p>
+          <button onClick={() => { if (confirm(`Delete ${person.name} ?`)) handleRemove(person.id) }}>delete</button>
+        </li>)}
     </ul>
   )
 }
@@ -71,6 +74,14 @@ const App = () => {
       : (setPersons(persons.concat(newPerson)), phonebookService.create(newPerson))
   }
 
+  const handleRemove = (id) => {
+    phonebookService
+      .remove(id)
+      .then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -78,7 +89,7 @@ const App = () => {
       <h2>Add a new</h2>
       <PersonForm newPerson={newPerson} addNewPerson={addNewPerson} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
       <h2>Numbers</h2>
-      <Persons persons={persons} filterWith={filterWith} />
+      <Persons persons={persons} filterWith={filterWith} handleRemove={handleRemove} />
     </div>
   )
 
