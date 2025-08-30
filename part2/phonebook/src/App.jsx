@@ -70,7 +70,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Filter filterWith={filterWith} handleFilterChange={handleFilterChange} />
-      <h2>add a new</h2>
+      <h2>Add a new</h2>
       <PersonForm newPerson={newPerson} addNewPerson={addNewPerson} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
       <h2>Numbers</h2>
       <Persons persons={persons} filterWith={filterWith} />
