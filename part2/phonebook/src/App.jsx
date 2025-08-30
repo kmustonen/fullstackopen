@@ -69,9 +69,19 @@ const App = () => {
   const addNewPerson = (e) => {
     e.preventDefault()
     const exists = persons.findIndex((person) => person.name === newPerson.name) !== -1
+    const id = Math.random().toString(36).substring(2, 6)
     exists
-      ? alert(`${newPerson.name} is already added to phonebook`)
-      : (setPersons(persons.concat(newPerson)), phonebookService.create(newPerson))
+      ? (confirm(`${newPerson.name} is already added to phonebook, replace the old number with a new one`) && updatePerson(newPerson))
+      : (setPersons(persons.concat({ ...newPerson, id })), phonebookService.create({ ...newPerson, id }))
+  }
+
+  const updatePerson = (newPerson) => {
+    const oldPerson = persons.find(person => person.name === newPerson.name)
+    phonebookService
+      .update(oldPerson.id, { ...oldPerson, number: newPerson.number })
+      .then(() => {
+        setPersons(persons.map(person => (person.name === newPerson.name) ? { ...person, number: newPerson.number } : person))
+      })
   }
 
   const handleRemove = (id) => {
