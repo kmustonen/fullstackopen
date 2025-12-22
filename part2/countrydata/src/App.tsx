@@ -1,6 +1,20 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const Country = ({ name, capital, area, languages, flag }: any) => {
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>Capital {capital}</p>
+      <p>Area {area}</p>
+      <h3>Languages</h3>
+      <ul>
+        {languages.map((language: string) => <li key={language}>{language}</li>)}
+      </ul>
+      <img src={flag} width="150px" />
+    </div>)
+}
+
 const App = () => {
   const [value, setValue] = useState('')
   const [country, setCountry] = useState<any>(null)
@@ -39,24 +53,18 @@ const App = () => {
     } else { setCountry(null) }
   }
 
+  const handleShow = (countryName: string) => () => {
+    getCountryData(countryName)
+  }
+
   return (
     <div>
       find countries: <input value={value} onChange={handleChange} />
-
-      {(matchingCountries.length <= 5 && matchingCountries.length > 1) && <ul>
-        {matchingCountries.map(country => <li key={country}>{country}</li>)}
+      {(!country && matchingCountries.length <= 5 && matchingCountries.length > 1) && <ul>
+        {matchingCountries.map(country => <li key={country}>{country}<button onClick={handleShow(country)}>Show</button></li>)}
       </ul>}
-      {(matchingCountries.length === 1 && country) && <div>
-        <h2>{country.name}</h2>
-        <p>Capital {country.capital}</p>
-        <p>Area {country.area}</p>
-        <h3>Languages</h3>
-        <ul>
-          {country.languages.map((language: string) => <li key={language}>{language}</li>)}
-        </ul>
-        <img src={country.flag} width="100px" />
-      </div>}
       {matchingCountries.length > 5 && <p>Too many matches, specify another filter</p>}
+      {country && <Country {...country} />}
     </div>
   )
 }
