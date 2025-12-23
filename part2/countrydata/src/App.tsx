@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const Country = ({ name, capital, area, languages, flag }: any) => {
+const Country = ({ name, capital, area, languages, flag, temp, wind, icon }: any) => {
   return (
     <div>
       <h2>{name}</h2>
@@ -12,6 +12,10 @@ const Country = ({ name, capital, area, languages, flag }: any) => {
         {languages.map((language: string) => <li key={language}>{language}</li>)}
       </ul>
       <img src={flag} width="150px" />
+      <h3>Weather in {capital}</h3>
+      <p>Temperature {temp} Celsius</p>
+      <img src={`https://openweathermap.org/img/wn/${icon}@2x.png`} />
+      <p>Wind {wind} m/s</p>
     </div>)
 }
 
@@ -21,8 +25,9 @@ const App = () => {
   const [countries, setCountries] = useState<string[]>([])
   const [matchingCountries, setMatching] = useState<string[]>([])
 
+  const api_key = import.meta.env.VITE_OPENWEATHER_API_KEY
+
   useEffect(() => {
-    console.log('fetching country names...')
     axios
       .get('https://studies.cs.helsinki.fi/restcountries/api/all')
       .then(response => {
@@ -31,13 +36,21 @@ const App = () => {
       })
   }, [])
 
+
   const getCountryData = (countryName: string) => {
     axios
       .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${countryName}`)
-      .then(response => {
-        setCountry({ name: countryName, capital: response.data.capital[0], area: response.data.area, languages: Object.values(response.data.languages), flag: response.data.flags.png })
+      .then(async response => {
+        let country = { name: countryName, capital: response.data.capital[0], area: response.data.area, languages: Object.values(response.data.languages), flag: response.data.flags.png }
+        axios
+          .get(`https://api.openweathermap.org/data/2.5/weather?q=${country.capital}&appid=${api_key}&units=metric`)
+          .then(response => {
+            console.log(response.data)
+            setCountry({ ...country, temp: response.data.main.temp, wind: response.data.wind.speed, icon: response.data.weather[0].icon })
+          })
       })
   }
+
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value)
@@ -49,7 +62,7 @@ const App = () => {
 
     setMatching(newMatching)
     if (newMatching.length === 1) {
-      setCountry(getCountryData(newMatching[0]))
+      getCountryData(newMatching[0])
     } else { setCountry(null) }
   }
 
