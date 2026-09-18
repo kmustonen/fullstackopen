@@ -1,12 +1,11 @@
 const express = require('express')
 const morgan = require('morgan')
-const cors = require('cors')
+const path = require('path')
 const app = express()
 
 morgan.token('body', req => JSON.stringify(req.body))
 
 app.use(express.json())
-app.use(cors())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let persons = [
@@ -80,7 +79,18 @@ app.get('/api/info', (req, res) => {
         `)
 })
 
-const PORT = 3001
+
+const frontendPath = path.join(__dirname, 'dist')
+app.use(express.static(frontendPath))
+
+app.get(/.*/, (req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        return next()
+    }
+
+    res.sendFile(path.join(frontendPath, 'index.html'))
+})
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })

@@ -101,8 +101,7 @@ const App = () => {
         setPersons(persons.concat(response.data))
         setNotificationMessage(`Added ${newPerson.name}`)
         setTimeout(() => setNotificationMessage(null), 3000)
-      })
-      .catch(error => {
+      }).catch(error => {
         setErrorMessage(error.response?.data?.error || `Could not add ${newPerson.name}`)
         setTimeout(() => setErrorMessage(null), 3000)
       })
@@ -131,9 +130,6 @@ const App = () => {
         setPersons(persons.filter(p => p.id !== person.id))
         setNotificationMessage(`Removed ${person.name}`)
         setTimeout(() => setNotificationMessage(null), 3000)
-      }).catch(() => {
-        setErrorMessage(`Could not remove ${person.name}`)
-        setTimeout(() => setErrorMessage(null), 3000)
       })
   }
 
