@@ -18,28 +18,28 @@ mongoose.set('strictQuery',false)
 mongoose.connect(url, { family: 4 })
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    phone: String,
+  name: String,
+  phone: String,
 })
 
 const Person = mongoose.model('Person', personSchema)
 
-if (process.argv.length == 5){
+if (process.argv.length === 5){
 
   const name = process.argv[3]
   const number = process.argv[4]
 
   const person = new Person({
     name: name,
-    number: phone,
+    number: number,
   })
 
-  person.save().then(result => {
-    console.log(`added ${name} number ${Number} to phonebook`)
+  person.save().then(() => {
+    console.log(`added ${name} number ${number} to phonebook`)
     mongoose.connection.close()
   })
-} 
-else if (process.argv.length == 3){
+}
+else if (process.argv.length === 3){
   Person.find({}).then(result => {
     result.forEach(person => {
       console.log(person)
