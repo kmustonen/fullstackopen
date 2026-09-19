@@ -98,18 +98,18 @@ const App = () => {
 
     if (persons.some(person => person.name === newPerson.name)) {
       updatePerson(newPerson)
+    } else {
+      phonebookService
+        .create(newPerson)
+        .then(response => {
+          setPersons(persons.concat(response.data))
+          setNotificationMessage(`Added ${newPerson.name}`)
+          setTimeout(() => setNotificationMessage(null), 3000)
+        }).catch(error => {
+          setErrorMessage(error.response?.data?.error || `Could not add ${newPerson.name}`)
+          setTimeout(() => setErrorMessage(null), 3000)
+        })
     }
-
-    phonebookService
-      .create(newPerson)
-      .then(response => {
-        setPersons(persons.concat(response.data))
-        setNotificationMessage(`Added ${newPerson.name}`)
-        setTimeout(() => setNotificationMessage(null), 3000)
-      }).catch(error => {
-        setErrorMessage(error.response?.data?.error || `Could not add ${newPerson.name}`)
-        setTimeout(() => setErrorMessage(null), 3000)
-      })
   }
 
   
