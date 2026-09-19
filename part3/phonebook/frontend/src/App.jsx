@@ -121,8 +121,8 @@ const App = () => {
         setPersons(persons.map(person => (person.name === newPerson.name) ? { ...person, number: newPerson.number } : person))
         setNotificationMessage(`Updated number for ${newPerson.name}`)
         setTimeout(() => setNotificationMessage(null), 3000)
-      }).catch(() => {
-        setErrorMessage(`Information of ${newPerson.name} has already been removed`)
+      }).catch((error) => {
+        setErrorMessage(error.response?.data?.error || `Error in updating number for ${newPerson.name}`)
         setTimeout(() => setErrorMessage(null), 3000)
       })
   }
