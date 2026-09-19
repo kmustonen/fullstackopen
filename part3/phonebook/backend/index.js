@@ -31,7 +31,7 @@ app.delete('/api/persons/:id', (req, res, next) => {
     .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
 
     if (!body.name) {
@@ -52,11 +52,32 @@ app.post('/api/persons', (req, res) => {
     }).catch(error => next(error))
 })
 
-app.get('/api/info', (req, res) => {
-    res.send(`
-        <p>Phonebook has info for ${persons.length} people</p>
-        <p>${new Date()}</p>
-        `)
+app.put('/api/persons/:id', (req, res, next) => {
+  const { name, number } = req.body
+
+  Person.findById(req.params.id)
+    .then(person => {
+      if (!person) {
+        return res.status(404).end()
+      }
+      person.name = name
+      person.number = number
+
+      return person.save().then((updatedPerson) => {
+        res.json(updatedPerson)
+      })
+    })
+    .catch(error => next(error))
+})
+
+app.get('/api/info', (req, res, next) => {
+
+    Person.find({}).then(persons => {
+        res.send(`
+            <p>Phonebook has info for ${persons.length} people</p>
+            <p>${new Date()}</p>
+            `)
+    }).catch(error => next(error))
 })
 
 

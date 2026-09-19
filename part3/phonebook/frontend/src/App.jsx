@@ -95,6 +95,11 @@ const App = () => {
 
   const addNewPerson = (e) => {
     e.preventDefault()
+
+    if (persons.some(person => person.name === newPerson.name)) {
+      updatePerson(newPerson)
+    }
+
     phonebookService
       .create(newPerson)
       .then(response => {
@@ -107,7 +112,7 @@ const App = () => {
       })
   }
 
-  /*
+  
   const updatePerson = (newPerson) => {
     const oldPerson = persons.find(person => person.name === newPerson.name)
     phonebookService
@@ -121,7 +126,6 @@ const App = () => {
         setTimeout(() => setErrorMessage(null), 3000)
       })
   }
-  */
 
   const handleRemove = (person) => {
     phonebookService
