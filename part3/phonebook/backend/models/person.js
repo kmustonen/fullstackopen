@@ -20,7 +20,7 @@ const personSchema = new mongoose.Schema({
     minLength: 3,
     required: true
   },
-  phone: {
+  number: {
     type: String,
     validate: {
       validator: function(v) {
