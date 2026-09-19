@@ -52,7 +52,7 @@ const Persons = ({ persons, filterWith, handleRemove }) => {
     <ul>
       {persons
         .filter(person => person.name.toLowerCase().includes(filterWith.toLowerCase()))
-        .map(person => <li key={person.name}>
+        .map(person => <li key={person.id}>
           <p>{person.name} {person.number}</p>
           <button onClick={() => { if (confirm(`Delete ${person.name} ?`)) handleRemove(person) }}>delete</button>
         </li>)}
