@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const path = require('path')
 const app = express()
+const Person = require('./models/person')
 
 morgan.token('body', req => JSON.stringify(req.body))
 
@@ -32,18 +34,15 @@ let persons = [
 ]
 
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+    Person.find({}).then(result => {
+        res.json(result)
+    })
 })
 
 app.get('/api/persons/:id', (req, res) => {
-    const id = req.params.id
-    const person = persons.find(person => person.id.toString() === id) ?? null
-
-    if (person) {
+    Person.findById(req.params.id).then(person => {
         res.json(person)
-    } else {
-        res.status(404).end()
-    }
+    })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
