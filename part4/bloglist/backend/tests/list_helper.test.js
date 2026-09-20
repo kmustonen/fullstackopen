@@ -82,3 +82,10 @@ describe('favorite blog', () => {
     assert.deepStrictEqual(result.likes, 12)
   })    
 })
+
+describe('most blogs', () => {
+  test('return author with most blogs', () => {
+    const result = listHelper.mostBlogs(blogs)
+    assert.deepStrictEqual(result.blogs, 3);
+  })
+})
