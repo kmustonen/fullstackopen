@@ -1,6 +1,7 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const listHelper = require('../utils/list_helper')
+const { resourceLimits } = require('node:worker_threads')
 
 const blogs = [
   {
@@ -80,12 +81,40 @@ describe('favorite blog', () => {
   test('return the blog with max number of likes', () => {
     const result = listHelper.favoriteBlog(blogs)
     assert.deepStrictEqual(result.likes, 12)
-  })    
+  })
+  
+  const listWithNoBlogs = []
+
+  test('return null when no blogs', () => {
+    const result = listHelper.favoriteBlog(listWithNoBlogs)
+    assert.strictEqual(result, null)
+  })
 })
 
 describe('most blogs', () => {
   test('return author with most blogs', () => {
     const result = listHelper.mostBlogs(blogs)
     assert.deepStrictEqual(result.blogs, 3);
+  })
+
+  const listWithNoBlogs = []
+
+  test('return null when no blogs', () => {
+    const result = listHelper.mostBlogs(listWithNoBlogs)
+    assert.strictEqual(result, null)
+  })
+})
+
+describe('most likes', () => {
+  test('return author with most likes', () => {
+    const result = listHelper.mostLikes(blogs)
+    assert.deepStrictEqual(result.likes, 17);
+  })
+
+  const listWithNoBlogs = []
+
+  test('return null when no blogs', () => {
+    const result = listHelper.mostLikes(listWithNoBlogs)
+    assert.strictEqual(result, null)
   })
 })
