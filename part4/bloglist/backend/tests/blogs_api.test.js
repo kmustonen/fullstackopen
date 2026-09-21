@@ -5,7 +5,6 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
-const { initial } = require('lodash')
 
 const api = supertest(app)
 
@@ -44,14 +43,14 @@ describe('when there are initially some blogs saved', () => {
       likes: 5
     }
 
-    const initialResponse = await api.get('/api/blogs')
+    const initialBlogs = await helper.blogsInDb()
     const newPost = new Blog(newBlog)
     await newPost.save()
 
-    const response = await api.get('/api/blogs')
-    assert.strictEqual(response.body.length, initialResponse.body.length + 1)
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, initialBlogs.length + 1)
 
-    const titles = response.body.map(b => b.title)
+    const titles = blogsAtEnd.map(b => b.title)
     assert(titles.includes('Example'))
   })
 
@@ -68,6 +67,36 @@ describe('when there are initially some blogs saved', () => {
       .expect(201)
 
     assert.strictEqual(response.body.likes, 0)
+  })
+
+  test('returns 400 with missing url', async () => {
+    const noUrlBlog = {
+      title: 'This blog has no url',
+      author: 'No Url'
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(noUrlBlog)
+      .expect(400)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  })
+
+  test('returns 400 with missing title', async () => {
+    const noUrlBlog = {
+      url: 'notitle.com',
+      author: 'No Title'
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(noUrlBlog)
+      .expect(400)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
   })
 })
 
