@@ -54,6 +54,21 @@ describe('when there are initially some blogs saved', () => {
     const titles = response.body.map(b => b.title)
     assert(titles.includes('Example'))
   })
+
+  test('likes defaults to 0', async () => {
+    const newBlog = {
+      title: 'Example',
+      author: 'Firstname Lastname',
+      url: 'google.com',
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+
+    assert.strictEqual(response.body.likes, 0)
+  })
 })
 
 after(async () => {
