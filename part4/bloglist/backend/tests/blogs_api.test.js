@@ -114,6 +114,50 @@ describe('when there are initially some blogs saved', () => {
 
     assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
   })
+
+  test('updating the likes of a blog works', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send({ likes: blogToUpdate.likes + 1 })
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(response.body.likes, blogToUpdate.likes + 1)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlog = blogsAtEnd.find(b => b.id === blogToUpdate.id)
+
+    assert.deepStrictEqual(updatedBlog.likes, blogToUpdate.likes + 1)
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
+  })
+
+  test('trying to update invalid id returns 400', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+
+    await api
+      .put('/api/blogs/invalidid')
+      .send({ likes: 10 })
+      .expect(400)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.deepStrictEqual(blogsAtStart, blogsAtEnd)
+  })
+
+  test('trying to update valid nonexisting id returns 404', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    var id = new mongoose.Types.ObjectId()
+
+    await api
+      .put(`/api/blogs/${id}`)
+      .send({ likes: 10 })
+      .expect(404)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.deepStrictEqual(blogsAtStart, blogsAtEnd)
+  })
 })
 
 after(async () => {
