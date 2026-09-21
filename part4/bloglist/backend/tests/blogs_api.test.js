@@ -5,6 +5,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const { initial } = require('lodash')
 
 const api = supertest(app)
 
@@ -33,6 +34,25 @@ describe('when there are initially some blogs saved', () => {
     response.body.forEach(blog => {
       assert.strictEqual(typeof blog.id, 'string')
     })
+  })
+
+  test('POST successfully creates a new blog post', async () => {
+    const newBlog = {
+      title: 'Example',
+      author: 'Firstname Lastname',
+      url: 'google.com',
+      likes: 5
+    }
+
+    const initialResponse = await api.get('/api/blogs')
+    const newPost = new Blog(newBlog)
+    await newPost.save()
+
+    const response = await api.get('/api/blogs')
+    assert.strictEqual(response.body.length, initialResponse.body.length + 1)
+
+    const titles = response.body.map(b => b.title)
+    assert(titles.includes('Example'))
   })
 })
 
