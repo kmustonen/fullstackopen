@@ -9,9 +9,14 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-  if (!request.user.id) {
+  if (!request.user) {
     return response.status(401).json({ error: 'token invalid' })
   }
+
+  if (!request.user.id) {
+    return response.status(400).json({ error: 'UserId missing or not valid' })
+  }
+
   const user = await User.findById(request.user.id)
 
   const blog = new Blog({ user: user._id, ...request.body })
@@ -23,16 +28,26 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
+  if (!request.user) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+
+  if (!request.user.id) {
+    return response.status(400).json({ error: 'UserId missing or not valid' })
+  }
+
   const blog = await Blog.findById(request.params.id)
 
-  if ( blog.user.toString() === request.user.id.toString() ) {
+  if (blog.user.toString() === request.user.id.toString()) {
     await blog.deleteOne()
+    return response.status(204).end()
   }
-  response.status(204).end()
+
+  response.status(403).json({ error: 'only creator can delete' })
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-  if (!request.user.id) {
+  if (!request.user) {
     return response.status(401).json({ error: 'token invalid' })
   }
 
@@ -41,6 +56,10 @@ blogsRouter.put('/:id', async (request, response) => {
   const blog = await Blog.findById(request.params.id)
   if (!blog) {
     return response.status(404).end()
+  }
+
+  if (blog.user.toString() !== request.user.id.toString()) {
+    return response.status(403).json({ error: 'only creator can update' })
   }
 
   blog.title = title ?? blog.title
