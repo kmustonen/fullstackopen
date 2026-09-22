@@ -20,7 +20,7 @@ describe('when there is initially one user in db', () => {
     await user.save()
   })
 
-  test('creation succeeds with a fresh username', async () => {
+  test('creation succeeds with a valid username and password', async () => {
     const usersAtStart = await helper.usersInDb()
 
     const newUser = {
@@ -41,6 +41,63 @@ describe('when there is initially one user in db', () => {
     const usernames = usersAtEnd.map(u => u.username)
     assert(usernames.includes(newUser.username))
   })
+
+  test('creation fails with an invalid username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'ab',
+      password: 'salainen',
+    }
+
+    await api.post('/api/users').send(newUser).expect(400)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.deepStrictEqual(usersAtStart, usersAtEnd)
+  })
+
+  test('creation fails without username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      name: 'nimi',
+      password: 'salainen',
+    }
+
+    await api.post('/api/users').send(newUser).expect(400)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.deepStrictEqual(usersAtStart, usersAtEnd)
+  })
+
+  test('creation fails with an invalid username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'kayttajanimi',
+      password: 'ab',
+    }
+
+    await api.post('/api/users').send(newUser).expect(400)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.deepStrictEqual(usersAtStart, usersAtEnd)
+  })
+
+  test('creation fails without password', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'kayttajanimi',
+      name: 'nimi',
+    }
+
+    await api.post('/api/users').send(newUser).expect(400)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.deepStrictEqual(usersAtStart, usersAtEnd)
+  })
+
 })
 
 after(async () => {
