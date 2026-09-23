@@ -81,6 +81,15 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
   }
 
+  const handleLike = async (blogObject) => {
+    blogObject = { ...blogObject, likes: blogObject.likes + 1}
+    await blogService.update(blogObject)
+
+    blogService.getAll().then(blogs =>
+      setBlogs( blogs )
+    )
+  } 
+
   return (
     <div>
       <ErrorNotification message={errorMessage} />
@@ -99,7 +108,7 @@ const App = () => {
       </div>
       )}
       {user && blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} handleLike={handleLike}/>
       )}
     </div>
   )

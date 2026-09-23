@@ -58,10 +58,6 @@ blogsRouter.put('/:id', async (request, response) => {
     return response.status(404).end()
   }
 
-  if (blog.user.toString() !== request.user.id.toString()) {
-    return response.status(403).json({ error: 'only creator can update' })
-  }
-
   blog.title = title ?? blog.title
   blog.author = author ?? blog.author
   blog.url = url ?? blog.url
