@@ -15,16 +15,15 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
   const [message, setMessage] = useState(null)
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
     )
-    
+
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistappUser')
+    
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
@@ -32,9 +31,7 @@ const App = () => {
     }
   }, [])
 
-  const handleSubmit = async event => {
-    event.preventDefault()
-    
+  const handleLogin = async ({ username, password}) => {
     try {
       const user = await loginService.login({ username, password })
 
@@ -44,8 +41,6 @@ const App = () => {
 
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
     } catch {
       setErrorMessage('wrong username or password')
       setTimeout(() => {
@@ -90,13 +85,7 @@ const App = () => {
     <div>
       <ErrorNotification message={errorMessage} />
       <Notification message={message} />
-      {!user && <LoginForm
-            username={username}
-            password={password}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
-            handleSubmit={handleSubmit}
-      />}
+      {!user && <LoginForm handleLogin={handleLogin} />}
       {user && (
       <div>
         <h1>blogs</h1>
