@@ -66,7 +66,7 @@ const App = () => {
 
     try {
       const returnedBlog = await blogService.create(blogObject)
-      setBlogs(blogs.concat(returnedBlog))
+      setBlogs(blogs.concat({ ...returnedBlog, user }))
       setMessage(`a new blog ${blogObject.title} by ${blogObject.author} was added`)
       setTimeout(() => {
         setMessage(null)
@@ -88,7 +88,19 @@ const App = () => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs.sort(function(a,b) {return b.likes - a.likes}) )
     )
-  } 
+  }
+  
+  const handleRemove = async (blogObject) => {
+    if (window.confirm(`remove blog ${blogObject.title} by ${blogObject.author}`)) {
+      await blogService.remove(blogObject)
+    }
+
+    blogService.getAll().then(blogs =>
+      setBlogs( blogs.sort(function(a,b) {return b.likes - a.likes}) )
+    )
+
+    setMessage(`blog ${blogObject.title} by ${blogObject.author} was removed`)
+  }
 
   return (
     <div>
@@ -108,7 +120,7 @@ const App = () => {
       </div>
       )}
       {user && blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} handleLike={handleLike}/>
+        <Blog key={blog.id} blog={blog} user={user} handleLike={handleLike} handleRemove={handleRemove}/>
       )}
     </div>
   )
