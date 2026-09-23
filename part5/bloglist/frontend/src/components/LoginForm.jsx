@@ -1,14 +1,14 @@
 import { useState } from 'react'
 
 const LoginForm = ({
-   handleLogin
-  }) => {
+  handleLogin
+}) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
   const login = async event => {
     event.preventDefault()
-    handleLogin({username, password})
+    handleLogin({ username, password })
   }
 
   return (
@@ -30,7 +30,7 @@ const LoginForm = ({
             value={password}
             onChange={({ target }) => setPassword(target.value)}
           />
-      </div>
+        </div>
         <button type="submit">login</button>
       </form>
     </div>

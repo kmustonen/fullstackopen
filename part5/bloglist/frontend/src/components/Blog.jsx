@@ -12,25 +12,25 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
   const [showDetails, setShowDetails] = useState(false)
 
   return (
-  <div style={blogStyle}>
-    <div>
-      {blog.title} {blog.author} {showDetails 
-        ? <button onClick={() => setShowDetails(false)}>hide</button>
-        : <button onClick={() => setShowDetails(true)}>view</button>}
-    </div>
-    {showDetails && <div>
-    <div>
-      {blog.url}
-    </div> 
-    <div>
+    <div style={blogStyle}>
+      <div>
+        {blog.title} {blog.author} {showDetails
+          ? <button onClick={() => setShowDetails(false)}>hide</button>
+          : <button onClick={() => setShowDetails(true)}>view</button>}
+      </div>
+      {showDetails && <div>
+        <div>
+          {blog.url}
+        </div>
+        <div>
       Likes: {blog.likes} <button onClick={() => handleLike(blog)}>like</button>
+        </div>
+        <div>
+          {blog.user.name}
+        </div>
+        {(blog.user.username === user.username) && <button  onClick={() => handleRemove(blog)}>delete</button>}
+      </div>}
     </div>
-    <div>
-      {blog.user.name}
-    </div>
-    {(blog.user.username === user.username) && <button  onClick={() => handleRemove(blog)}>delete</button>}
-    </div>} 
-  </div>  
   )
 }
 

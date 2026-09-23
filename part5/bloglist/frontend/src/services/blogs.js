@@ -32,7 +32,7 @@ const update = async blog => {
 
 const remove = async blog => {
   const config = {
-    headers: {Authorization: token}
+    headers: { Authorization: token }
   }
 
   const url = `${baseUrl}/${blog.id}`
