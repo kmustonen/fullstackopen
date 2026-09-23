@@ -19,7 +19,7 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs( blogs.sort(function(a,b) {return b.likes - a.likes}) )
     )
 
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistappUser')
@@ -86,7 +86,7 @@ const App = () => {
     await blogService.update(blogObject)
 
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs( blogs.sort(function(a,b) {return b.likes - a.likes}) )
     )
   } 
 
