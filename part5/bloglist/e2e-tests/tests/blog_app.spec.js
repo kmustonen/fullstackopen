@@ -1,5 +1,12 @@
 const { describe, beforeEach, test, expect } = require('@playwright/test')
 
+const loginUser = async (page, username, password) => {
+  const textboxes = await page.getByRole('textbox').all()
+  await textboxes[0].fill(username)
+  await textboxes[1].fill(password)
+  await page.getByRole('button', { name: 'login' }).click()
+}
+
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
     await request.post('http://localhost:3003/api/testing/reset')
@@ -23,21 +30,32 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('login succeeds with correct credentials', async ({ page }) => {
-      const textboxes = await page.getByRole('textbox').all()
-      await textboxes[0].fill('kmustonen')
-      await textboxes[1].fill('salasana')
-      await page.getByRole('button', { name: 'login' }).click()
-
+      await loginUser(page, 'kmustonen', 'salasana')
       await expect(page.getByText('kmustonen logged in')).toBeVisible()
     })
 
     test('login fails with incorrect credentials', async ({ page }) => {
-      const textboxes = await page.getByRole('textbox').all()
-      await textboxes[0].fill('kmustonen')
-      await textboxes[1].fill('password')
-      await page.getByRole('button', { name: 'login' }).click()
-
+      await loginUser(page, 'kmustonen', 'wrongpassword')
       await expect(page.getByText('wrong username or password')).toBeVisible()
+    })
+  })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await loginUser (page, 'kmustonen', 'salasana')
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'create new blog' }).click()
+
+      const textboxes = await page.getByRole('textbox').all()
+      await textboxes[0].fill('Test Title')
+      await textboxes[1].fill('Test Author')
+      await textboxes[2].fill('Test URL')
+      await page.getByRole('button', { name: 'create' }).click()
+
+      page.getByText('Test Title Test Author')
+      page.getByRole('button', { name: 'view'})
     })
   })
 })
