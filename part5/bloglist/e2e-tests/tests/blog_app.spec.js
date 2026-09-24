@@ -27,6 +27,14 @@ describe('Blog app', () => {
       }
     })
 
+    await request.post('http://localhost:3003/api/users', {
+      data: {
+        name: 'Other User',
+        username: 'ouser',
+        password: 'password'
+      }
+    })
+
     await page.goto('http://localhost:5173')
   })
 
@@ -76,6 +84,20 @@ describe('Blog app', () => {
       await page.getByRole('button', { name: 'remove'}).click()
 
       await expect(page.getByText('Test Title Test Author')).not.toBeVisible()
+    })
+
+    test('user who did create the blog can see the remove button', async ({ page }) => {
+      await createBlog(page, 'Test Title', 'Test Author', 'Test URL')
+      await page.getByRole('button', { name: 'view'}).click()
+      await expect(page.getByRole('button', { name: 'remove'})).toBeVisible()
+    })
+
+    test('user who did not create the blog cannot see the remove button', async ({ page }) => {
+      await createBlog(page, 'Test Title', 'Test Author', 'Test URL')
+      await page.getByRole('button', { name: 'logout'}).click()
+      await loginUser(page, 'ouser', 'password')
+      await page.getByRole('button', { name: 'view'}).click()
+      await expect(page.getByRole('button', { name: 'remove'})).not.toBeVisible()
     })
 
   })
