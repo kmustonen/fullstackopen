@@ -7,6 +7,15 @@ const loginUser = async (page, username, password) => {
   await page.getByRole('button', { name: 'login' }).click()
 }
 
+const createBlog = async (page, title, author, url) => {
+  await page.getByRole('button', { name: 'create new blog' }).click()
+  const textboxes = await page.getByRole('textbox').all()
+  await textboxes[0].fill(title)
+  await textboxes[1].fill(author)
+  await textboxes[2].fill(url)
+  await page.getByRole('button', { name: 'create' }).click()
+}
+
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
     await request.post('http://localhost:3003/api/testing/reset')
@@ -46,16 +55,18 @@ describe('Blog app', () => {
     })
 
     test('a new blog can be created', async ({ page }) => {
-      await page.getByRole('button', { name: 'create new blog' }).click()
-
-      const textboxes = await page.getByRole('textbox').all()
-      await textboxes[0].fill('Test Title')
-      await textboxes[1].fill('Test Author')
-      await textboxes[2].fill('Test URL')
-      await page.getByRole('button', { name: 'create' }).click()
+      await createBlog(page, 'Test Title', 'Test Author', 'Test URL')
 
       page.getByText('Test Title Test Author')
       page.getByRole('button', { name: 'view'})
+    })
+
+    test('a user can like a created blog', async ({ page }) => {
+      await createBlog(page, 'Test Title', 'Test Author', 'Test URL')
+      await page.getByRole('button', { name: 'view'}).click()
+      await page.getByRole('button', { name: 'like'}).click()
+
+      await expect(page.getByText('likes: 1')).toBeVisible()
     })
   })
 })
