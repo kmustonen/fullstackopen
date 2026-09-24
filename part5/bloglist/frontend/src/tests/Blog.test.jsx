@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Blog from '../components/Blog'
 
 describe('<Blog />', () => {
@@ -30,5 +31,16 @@ describe('<Blog />', () => {
     expect(screen.queryByText('Test URL')).toBeNull()
     expect(screen.queryByText('Test Name')).toBeNull()
     expect(screen.queryByText('remove')).toBeNull()
+  })
+
+  test('details are shown after clicking view button', async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('view')
+
+    await user.click(button)
+    screen.getByText('Likes: 67', { exact: false })
+    screen.getByText('Test URL')
+    screen.getByText('Test Name')
+    screen.getByText('remove')
   })
 })
