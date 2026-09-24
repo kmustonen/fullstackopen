@@ -3,6 +3,9 @@ import userEvent from '@testing-library/user-event'
 import Blog from '../components/Blog'
 
 describe('<Blog />', () => {
+  let mockLikeHandler
+  let mockRemoveHandler
+
   beforeEach(() => {
     const testUser = {
       username: 'username',
@@ -17,10 +20,11 @@ describe('<Blog />', () => {
       user: testUser
     }
 
-    const mockHandler = vi.fn()
+    mockLikeHandler = vi.fn()
+    mockRemoveHandler = vi.fn()
 
     render(
-      <Blog blog={blog} user={testUser} handleLike={mockHandler} handleRemove={mockHandler} />
+      <Blog blog={blog} user={testUser} handleLike={mockLikeHandler} handleRemove={mockRemoveHandler} />
     )
   })
 
@@ -42,5 +46,17 @@ describe('<Blog />', () => {
     screen.getByText('Test URL')
     screen.getByText('Test Name')
     screen.getByText('remove')
+  })
+
+  test('like button calls the like handler', async () => {
+    const user = userEvent.setup()
+    const viewButton = screen.getByText('view')
+    await user.click(viewButton)
+
+    const likeButton = screen.getByText('like')
+    await user.click(likeButton)
+    await user.click(likeButton)
+
+    expect(mockLikeHandler.mock.calls).toHaveLength(2)
   })
 })
