@@ -6,57 +6,122 @@ describe('<Blog />', () => {
   let mockLikeHandler
   let mockRemoveHandler
 
-  beforeEach(() => {
-    const testUser = {
-      username: 'username',
-      name: 'Test Name'
-    }
+  describe('not logged in', () => {
+    beforeEach(() => {
+      const testUser = {
+        username: 'username',
+        name: 'Test Name'
+      }
 
-    const blog = {
-      title: 'Test Title',
-      author: 'Test Name',
-      url: 'Test URL',
-      likes: '67',
-      user: testUser
-    }
+      const blog = {
+        title: 'Test Title',
+        author: 'Test Name',
+        url: 'Test URL',
+        likes: '67',
+        user: testUser
+      }
 
-    mockLikeHandler = vi.fn()
-    mockRemoveHandler = vi.fn()
+      mockLikeHandler = vi.fn()
+      mockRemoveHandler = vi.fn()
 
-    render(
-      <Blog blog={blog} user={testUser} handleLike={mockLikeHandler} handleRemove={mockRemoveHandler} />
-    )
+      render(
+        <Blog blog={blog} user={null} handleLike={mockLikeHandler} handleRemove={mockRemoveHandler} />
+      )
+    })
+
+    test('details are correctly shown', async () => {
+      screen.getByText('Test Title Test Name')
+      screen.getByText('likes: 67')
+      screen.getByText('Test URL')
+      screen.getByText('Test Name')
+      expect(screen.queryByText('like')).toBeNull()
+      expect(screen.queryByText('delete')).toBeNull()
+    })
   })
 
-  test('title and author are correctly displayed', async () => {
-    screen.getByText('Test Title Test Name')
-    screen.getByText('view')
-    expect(screen.queryByText('Likes: 67', { exact: false })).toBeNull()
-    expect(screen.queryByText('Test URL')).toBeNull()
-    expect(screen.queryByText('Test Name')).toBeNull()
-    expect(screen.queryByText('remove')).toBeNull()
+  describe('blog creator logged in', () => {
+    beforeEach(() => {
+      const testUser = {
+        username: 'username',
+        name: 'Test Name'
+      }
+
+      const blog = {
+        title: 'Test Title',
+        author: 'Test Name',
+        url: 'Test URL',
+        likes: '67',
+        user: testUser
+      }
+
+      mockLikeHandler = vi.fn()
+      mockRemoveHandler = vi.fn()
+
+      render(
+        <Blog blog={blog} user={testUser} handleLike={mockLikeHandler} handleRemove={mockRemoveHandler} />
+      )
+    })
+
+    test('details are correctly shown', async () => {
+      screen.getByText('Test Title Test Name')
+      screen.getByText('likes: 67')
+      screen.getByText('Test URL')
+      screen.getByText('Test Name')
+      screen.getByText('like')
+      screen.getByText('delete')
+    })
+
+    test('delete button calls the delete handler', async () => {
+      const user = userEvent.setup()
+
+      const deleteButton = screen.getByText('delete')
+      await user.click(deleteButton)
+
+      expect(mockRemoveHandler.mock.calls).toHaveLength(1)
+    })
+
+    test('like button calls the like handler', async () => {
+      const user = userEvent.setup()
+
+      const likeButton = screen.getByText('like')
+      await user.click(likeButton)
+      await user.click(likeButton)
+
+      expect(mockLikeHandler.mock.calls).toHaveLength(2)
+    })
   })
 
-  test('details are shown after clicking view button', async () => {
-    const user = userEvent.setup()
-    const button = screen.getByText('view')
+  describe('different user logged in', () => {
+    beforeEach(() => {
+      const testUser = {
+        username: 'username',
+        name: 'Test Name'
+      }
 
-    await user.click(button)
-    screen.getByText('Likes: 67', { exact: false })
-    screen.getByText('Test URL')
-    screen.getByText('Test Name')
-    screen.getByText('remove')
-  })
+      const blog = {
+        title: 'Test Title',
+        author: 'Test Name',
+        url: 'Test URL',
+        likes: '67',
+        user: testUser
+      }
 
-  test('like button calls the like handler', async () => {
-    const user = userEvent.setup()
-    const viewButton = screen.getByText('view')
-    await user.click(viewButton)
+      const anotherUser = {
+        username: 'wronguser',
+        name: 'Wrong User'
+      }
 
-    const likeButton = screen.getByText('like')
-    await user.click(likeButton)
-    await user.click(likeButton)
+      mockLikeHandler = vi.fn()
+      mockRemoveHandler = vi.fn()
 
-    expect(mockLikeHandler.mock.calls).toHaveLength(2)
+      render(
+        <Blog blog={blog} user={anotherUser} handleLike={mockLikeHandler} handleRemove={mockRemoveHandler} />
+      )
+    })
+
+    test('users who are not the blog’s creator are shown only the like button', async () => {
+      screen.getByText('like')
+      expect(screen.queryByText('delete')).toBeNull()
+    })
   })
 })
