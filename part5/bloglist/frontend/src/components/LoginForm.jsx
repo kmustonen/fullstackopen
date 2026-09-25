@@ -23,7 +23,7 @@ const LoginForm = ({
 
       <form onSubmit={login}>
         <div><TextField label='username: ' value={username} onChange={({ target }) => setUsername(target.value)} style={{ marginTop: 10 }} variant="standard" /></div>
-        <div><TextField label='password: ' value={password} onChange={({ target }) => setPassword(target.value)} style={{ marginTop: 10 }} variant="standard" /></div>
+        <div><TextField type="password" label='password: ' value={password} onChange={({ target }) => setPassword(target.value)} style={{ marginTop: 10 }} variant="standard" /></div>
 
         <Button type="submit" variant="contained" style={{ marginTop: 10 }}>login</Button>
       </form>

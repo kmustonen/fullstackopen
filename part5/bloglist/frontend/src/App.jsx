@@ -1,4 +1,4 @@
-import { Container } from '@mui/material'
+import { Container, AppBar, Toolbar, Button, Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
 
 import blogService from './services/blogs'
@@ -13,14 +13,15 @@ import Blog from './components/Blog'
 import BlogList from './components/BlogList'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
-import ErrorNotification from './components/ErrorNotification'
 
 const App = () => {
   const navigate = useNavigate()
 
   const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [message, setMessage] = useState(null)
+  const [message, setMessage] = useState({
+    message: null,
+    status: null
+  })
   const [user, setUser] = useState(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistappUser')
     if (!loggedUserJSON) return null
@@ -47,9 +48,9 @@ const App = () => {
       setUser(user)
       return true
     } catch {
-      setErrorMessage('wrong username or password')
+      setMessage({ message: 'wrong username or password', status: 'error' })
       setTimeout(() => {
-        setErrorMessage(null)
+        setMessage({ message: null, status: null })
       }, 5000)
       return false
     }
@@ -63,9 +64,9 @@ const App = () => {
 
   const createBlog = async (blogObject) => {
     if (!blogObject.title || !blogObject.url) {
-      setErrorMessage('title and url are required')
+      setMessage({ message: 'title and url are required', status: 'error' })
       setTimeout(() => {
-        setErrorMessage(null)
+        setMessage({ message: null, status: null })
       }, 5000)
       return
     }
@@ -73,15 +74,18 @@ const App = () => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat({ ...returnedBlog, user }))
-      setMessage(`a new blog ${blogObject.title} by ${blogObject.author} was added`)
+      setMessage({
+        message: `a new blog ${blogObject.title} by ${blogObject.author} was added`,
+        status: 'success'
+      })
       setTimeout(() => {
-        setMessage(null)
+        setMessage({ message: null, status: null })
       }, 5000)
       navigate('/')
     } catch {
-      setErrorMessage('error in adding new blog')
+      setMessage({ message: 'error in adding new blog', status: 'error' })
       setTimeout(() => {
-        setErrorMessage(null)
+        setMessage({ message: null, status: null })
       }, 5000)
     }
   }
@@ -98,9 +102,12 @@ const App = () => {
   const handleRemove = async (blogObject) => {
     if (window.confirm(`remove blog ${blogObject.title} by ${blogObject.author}`)) {
       await blogService.remove(blogObject)
-      setMessage(`blog ${blogObject.title} by ${blogObject.author} was removed`)
+      setMessage({
+        message: `blog ${blogObject.title} by ${blogObject.author} was removed`,
+        status: 'success'
+      })
       setTimeout(() => {
-        setMessage(null)
+        setMessage({ message: null, status: null })
       }, 5000)
       const updatedBlogs = await blogService.getAll()
       setBlogs( updatedBlogs.sort(function(a,b) {return b.likes - a.likes}))
@@ -113,21 +120,22 @@ const App = () => {
     ? blogs.find(blog => blog.id === match.params.id)
     : null
 
-  const padding = {
-    padding: 5
-  }
+  const style = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
 
   return (
     <Container>
-      <div>
-        <Link style={ padding } to="/">home</Link>
-        {user && <Link style={ padding } to="/create">new blog</Link>}
-        {!user
-          ? <Link style={ padding } to="/login">login</Link>
-          : <button onClick={handleLogout}>logout</button>}
-      </div>
-      <ErrorNotification message={errorMessage} />
-      <Notification message={message} />
+      <AppBar position="static">
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Typography variant="h6">blog app</Typography>
+          <div><Button color="inherit" component={Link} to="/" sx={style}>home</Button>
+            {user && <Button color="inherit" component={Link} to="/create" sx={style}>new blog</Button>}
+            {!user
+              ? <Button color="inherit" component={Link} to="/login" sx={style}>login</Button>
+              : <Button color="inherit" onClick={handleLogout} sx={style}>logout</Button>}
+          </div>
+        </Toolbar>
+      </AppBar>
+      <Notification message={message.message} status={message.status} />
       <Routes>
         <Route path="/" element={
           <BlogList
