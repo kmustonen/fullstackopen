@@ -1,12 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
+
+import blogService from './services/blogs'
+import loginService from './services/login'
+
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link, Navigate
+} from 'react-router-dom'
+
 import LoginForm from './components/LoginForm'
+import BlogList from './components/BlogList'
 import BlogForm from './components/BlogForm'
-import Blog from './components/Blog'
 import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import ErrorNotification from './components/ErrorNotification'
-import blogService from './services/blogs'
-import loginService from './services/login'
 
 
 const App = () => {
@@ -15,20 +22,18 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
   const [message, setMessage] = useState(null)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBloglistappUser')
+    if (!loggedUserJSON) return null
+    const user = JSON.parse(loggedUserJSON)
+    blogService.setToken(user.token)
+    return user
+  })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs.sort(function(a,b) {return b.likes - a.likes}) )
     )
-
-    const loggedUserJSON = window.localStorage.getItem('loggedBloglistappUser')
-
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
-    }
   }, [])
 
   const handleLogin = async ({ username, password }) => {
@@ -41,11 +46,13 @@ const App = () => {
 
       blogService.setToken(user.token)
       setUser(user)
+      return true
     } catch {
       setErrorMessage('wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
+      return false
     }
   }
 
@@ -100,29 +107,48 @@ const App = () => {
     )
 
     setMessage(`blog ${blogObject.title} by ${blogObject.author} was removed`)
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
+  }
+
+  const padding = {
+    padding: 5
   }
 
   return (
-    <div>
+    <Router>
+      <div>
+        <Link style={ padding } to="/">home</Link>
+        {!user
+          ? <Link style={ padding } to="/login">login</Link>
+          : <button onClick={handleLogout}>logout</button>}
+      </div>
       <ErrorNotification message={errorMessage} />
       <Notification message={message} />
-      {!user && <LoginForm handleLogin={handleLogin} />}
-      {user && (
-        <div>
-          <h1>blogs</h1>
-          <p>{user.username} logged in</p>
-          <button onClick={handleLogout}>logout</button>
-          <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-            <BlogForm
-              createBlog={createBlog}
-            />
-          </Togglable>
-        </div>
-      )}
-      {user && blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} user={user} handleLike={handleLike} handleRemove={handleRemove}/>
-      )}
-    </div>
+      <Routes>
+        <Route path="/" element={
+          <div>
+            <h1>blogs</h1>
+            {user &&
+            <>
+              <p>{user.username} logged in</p>
+              <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+                <BlogForm
+                  createBlog={createBlog}
+                />
+              </Togglable>
+            </>}
+            <BlogList blogs={blogs} user={user} handleLike={handleLike} handleRemove={handleRemove}/>
+          </div>
+        }/>
+        <Route path="/login" element={
+          user
+            ? <Navigate replace to="/" />
+            : <LoginForm handleLogin={handleLogin} />
+        }/>
+      </Routes>
+    </Router>
   )
 }
 

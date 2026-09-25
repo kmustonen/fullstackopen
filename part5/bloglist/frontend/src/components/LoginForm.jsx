@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const LoginForm = ({
   handleLogin
@@ -6,9 +7,12 @@ const LoginForm = ({
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
+  const navigate = useNavigate()
+
   const login = async event => {
     event.preventDefault()
-    handleLogin({ username, password })
+    const success = await handleLogin({ username, password })
+    if (success) navigate('/')
   }
 
   return (
@@ -17,23 +21,23 @@ const LoginForm = ({
 
       <form onSubmit={login}>
         <div>
-        <label>
+          <label>
           username
-          <input
-            value={username}
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </label>
+            <input
+              value={username}
+              onChange={({ target }) => setUsername(target.value)}
+            />
+          </label>
         </div>
         <div>
-        <label>
+          <label>
           password
-          <input
-            type="password"
-            value={password}
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </label>
+            <input
+              type="password"
+              value={password}
+              onChange={({ target }) => setPassword(target.value)}
+            />
+          </label>
         </div>
         <button type="submit">login</button>
       </form>
