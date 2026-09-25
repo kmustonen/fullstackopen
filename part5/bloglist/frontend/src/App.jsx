@@ -4,20 +4,20 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 import {
-  BrowserRouter as Router,
-  Routes, Route, Link, Navigate
+  Routes, Route, Link, Navigate, useMatch, useNavigate
 } from 'react-router-dom'
 
 import LoginForm from './components/LoginForm'
+import Blog from './components/Blog'
 import BlogList from './components/BlogList'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import ErrorNotification from './components/ErrorNotification'
 
-
 const App = () => {
   const blogFormRef = useRef()
+  const navigate = useNavigate()
 
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
@@ -100,24 +100,27 @@ const App = () => {
   const handleRemove = async (blogObject) => {
     if (window.confirm(`remove blog ${blogObject.title} by ${blogObject.author}`)) {
       await blogService.remove(blogObject)
+      setMessage(`blog ${blogObject.title} by ${blogObject.author} was removed`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+      const updatedBlogs = await blogService.getAll()
+      setBlogs( updatedBlogs.sort(function(a,b) {return b.likes - a.likes}))
+      navigate('/')
     }
-
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs.sort(function(a,b) {return b.likes - a.likes}) )
-    )
-
-    setMessage(`blog ${blogObject.title} by ${blogObject.author} was removed`)
-    setTimeout(() => {
-      setMessage(null)
-    }, 5000)
   }
+
+  const match = useMatch('/blogs/:id')
+  const blog = match
+    ? blogs.find(blog => blog.id === match.params.id)
+    : null
 
   const padding = {
     padding: 5
   }
 
   return (
-    <Router>
+    <>
       <div>
         <Link style={ padding } to="/">home</Link>
         {!user
@@ -147,8 +150,16 @@ const App = () => {
             ? <Navigate replace to="/" />
             : <LoginForm handleLogin={handleLogin} />
         }/>
+        <Route path="/blogs/:id" element={
+          <Blog
+            blog={blog}
+            user={user}
+            handleLike={handleLike}
+            handleRemove={handleRemove}
+          />
+        } />
       </Routes>
-    </Router>
+    </>
   )
 }
 

@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 const Blog = ({ blog, user, handleLike, handleRemove }) => {
   const blogStyle = {
     paddingTop: 10,
@@ -9,19 +7,17 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
     marginBottom: 5
   }
 
-  const [showDetails, setShowDetails] = useState(false)
+  if (!blog) return null
 
   return (
     <div style={blogStyle}>
       <div>
-        {blog.title} {blog.author} {showDetails
-          ? <button onClick={() => setShowDetails(false)}>hide</button>
-          : <button onClick={() => setShowDetails(true)}>view</button>}
+        {blog.title} {blog.author}
       </div>
-      {showDetails && <div>
-        <div>
+      <div>
+        <a href={blog.url}>
           {blog.url}
-        </div>
+        </a>
         <div>
       likes: {blog.likes} {user && <button onClick={() => handleLike(blog)}>like</button>}
         </div>
@@ -29,7 +25,7 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
           {blog.user.name}
         </div>
         {user && blog.user.username === user.username && <button  onClick={() => handleRemove(blog)}>remove</button>}
-      </div>}
+      </div>
     </div>
   )
 }
