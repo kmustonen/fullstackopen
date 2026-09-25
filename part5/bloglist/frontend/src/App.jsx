@@ -1,3 +1,4 @@
+import { Container } from '@mui/material'
 import { useState, useEffect } from 'react'
 
 import blogService from './services/blogs'
@@ -117,7 +118,7 @@ const App = () => {
   }
 
   return (
-    <>
+    <Container>
       <div>
         <Link style={ padding } to="/">home</Link>
         {user && <Link style={ padding } to="/create">new blog</Link>}
@@ -152,7 +153,7 @@ const App = () => {
           />
         } />
       </Routes>
-    </>
+    </Container>
   )
 }
 

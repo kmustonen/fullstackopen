@@ -1,3 +1,4 @@
+import { Typography, TextField, Button } from '@mui/material'
 import { useState } from 'react'
 
 const BlogForm = ({ createBlog }) => {
@@ -19,18 +20,16 @@ const BlogForm = ({ createBlog }) => {
   }
 
   return (
-    <form onSubmit={addBlog}>
-      <div>
-        <label>title: <input value={newBlogTitle} onChange={({ target }) => setNewBlogTitle(target.value)} /></label>
-      </div>
-      <div>
-        <label>author: <input value={newBlogAuthor} onChange={({ target }) => setNewBlogAuthor(target.value)} /></label>
-      </div>
-      <div>
-        <label>url: <input value={newBlogUrl} onChange={({ target }) => setNewBlogUrl(target.value)} /></label>
-      </div>
-      <button type="submit">create</button>
-    </form>
+    <div>
+      <Typography variant="h4" gutterBottom>create new</Typography>
+      <form onSubmit={addBlog}>
+        <div><TextField label='title: ' value={newBlogTitle} onChange={({ target }) => setNewBlogTitle(target.value)} style={{ marginTop: 10 }} variant="standard" /></div>
+        <div><TextField label='author: ' value={newBlogAuthor} onChange={({ target }) => setNewBlogAuthor(target.value)} style={{ marginTop: 10 }} variant="standard" /></div>
+        <div><TextField label='url: ' value={newBlogUrl} onChange={({ target }) => setNewBlogUrl(target.value)} style={{ marginTop: 10 }} variant="standard" /></div>
+
+        <Button type="submit" variant="contained" style={{ marginTop: 10 }}>create</Button>
+      </form>
+    </div>
   )
 }
 export default BlogForm

@@ -1,3 +1,5 @@
+import { Typography, TextField, Button } from '@mui/material'
+
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -17,29 +19,13 @@ const LoginForm = ({
 
   return (
     <div>
-      <h2>login</h2>
+      <Typography variant="h4" gutterBottom>login</Typography>
 
       <form onSubmit={login}>
-        <div>
-          <label>
-          username
-            <input
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-          password
-            <input
-              type="password"
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </label>
-        </div>
-        <button type="submit">login</button>
+        <div><TextField label='username: ' value={username} onChange={({ target }) => setUsername(target.value)} style={{ marginTop: 10 }} variant="standard" /></div>
+        <div><TextField label='password: ' value={password} onChange={({ target }) => setPassword(target.value)} style={{ marginTop: 10 }} variant="standard" /></div>
+
+        <Button type="submit" variant="contained" style={{ marginTop: 10 }}>login</Button>
       </form>
     </div>
   )
