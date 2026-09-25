@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -11,12 +11,10 @@ import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
 import BlogList from './components/BlogList'
 import BlogForm from './components/BlogForm'
-import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 import ErrorNotification from './components/ErrorNotification'
 
 const App = () => {
-  const blogFormRef = useRef()
   const navigate = useNavigate()
 
   const [blogs, setBlogs] = useState([])
@@ -78,14 +76,13 @@ const App = () => {
       setTimeout(() => {
         setMessage(null)
       }, 5000)
+      navigate('/')
     } catch {
-      setErrorMessage('could not add new blog')
+      setErrorMessage('error in adding new blog')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
     }
-
-    blogFormRef.current.toggleVisibility()
   }
 
   const handleLike = async (blogObject) => {
@@ -123,6 +120,7 @@ const App = () => {
     <>
       <div>
         <Link style={ padding } to="/">home</Link>
+        {user && <Link style={ padding } to="/create">new blog</Link>}
         {!user
           ? <Link style={ padding } to="/login">login</Link>
           : <button onClick={handleLogout}>logout</button>}
@@ -131,24 +129,19 @@ const App = () => {
       <Notification message={message} />
       <Routes>
         <Route path="/" element={
-          <div>
-            <h1>blogs</h1>
-            {user &&
-            <>
-              <p>{user.username} logged in</p>
-              <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-                <BlogForm
-                  createBlog={createBlog}
-                />
-              </Togglable>
-            </>}
-            <BlogList blogs={blogs} user={user} handleLike={handleLike} handleRemove={handleRemove}/>
-          </div>
+          <BlogList
+            blogs={blogs}
+            user={user}/>
         }/>
         <Route path="/login" element={
           user
             ? <Navigate replace to="/" />
             : <LoginForm handleLogin={handleLogin} />
+        }/>
+        <Route path="/create" element={
+          user
+            ? <BlogForm createBlog={createBlog} />
+            : <Navigate replace to="/"/>
         }/>
         <Route path="/blogs/:id" element={
           <Blog
