@@ -1,32 +1,29 @@
+import { Typography, Button, Stack, Card } from '@mui/material'
+
 const Blog = ({ blog, user, handleLike, handleRemove }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
 
   if (!blog) return null
 
   return (
-    <div style={blogStyle}>
-      <div>
-        {blog.title} {blog.author}
-      </div>
-      <div>
-        <a href={blog.url}>
-          {blog.url}
-        </a>
+    <Card style={{ marginTop: 10, maxWidth: 600 }}>
+      <Stack direction='column' style={{ padding: 10 }}>
+        <Typography variant='h4'>
+          {blog.title}
+        </Typography>
+        <Typography variant='h6'>
+        by {blog.author}
+        </Typography>
         <div>
-      likes: {blog.likes} {user && <button onClick={() => handleLike(blog)}>like</button>}
+          <a href={blog.url}>{blog.url}</a>
+          <div>Added by {blog.user.name}</div>
+          <Typography variant='h6'>{blog.likes} likes</Typography>
+          <Stack direction='row' spacing={2}>
+            {user && <Button variant='outlined' onClick={() => handleLike(blog)}>like</Button>}
+            {user && blog.user.username === user.username && <Button variant='outlined' color='error' onClick={() => handleRemove(blog)}>delete</Button>}
+          </Stack>
         </div>
-        <div>
-          {blog.user.name}
-        </div>
-        {user && blog.user.username === user.username && <button  onClick={() => handleRemove(blog)}>delete</button>}
-      </div>
-    </div>
+      </Stack>
+    </Card>
   )
 }
 

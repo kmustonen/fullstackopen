@@ -13,7 +13,7 @@ const createBlog = async (page, title, author, url) => {
   await page.getByLabel('author:').fill(author)
   await page.getByLabel('url:').fill(url)
   await page.getByRole('button', { name: 'create' }).click()
-  await expect(page.getByRole('link', { name: 'Test Title Test Author' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Test Title by Test Author' })).toBeVisible()
 }
 
 describe('Blog app', () => {
@@ -70,31 +70,31 @@ describe('Blog app', () => {
     test('a user can create a blog', async ({ page }) => {
       await createBlog(page, 'Test Title', 'Test Author', 'Test URL')
 
-      await expect(page.getByText('Test Title Test Author')).toBeVisible()
+      await expect(page.getByRole('link', {name: 'Test Title by Test Author'})).toBeVisible()
     })
 
     test('a user can like a blog', async ({ page }) => {
       await createBlog(page, 'Test Title', 'Test Author', 'Test URL')
-      await page.getByRole('link', { name: 'Test Title Test Author' }).click()
+      await page.getByRole('link', { name: 'Test Title by Test Author' }).click()
       await page.getByRole('button', { name: 'like'}).click()
 
-      await expect(page.getByText('likes: 1')).toBeVisible()
+      await expect(page.getByText('1 likes')).toBeVisible()
     })
 
     test('a user can delete a blog', async ({ page }) => {
       await createBlog(page, 'Test Title', 'Test Author', 'Test URL')
-      await page.getByRole('link', { name: 'Test Title Test Author' }).click()
+      await page.getByRole('link', { name: 'Test Title by Test Author' }).click()
       page.on('dialog', dialog => dialog.accept())
       await page.getByRole('button', { name: 'delete'}).click()
 
-      await expect(page.getByRole('link', { name: 'Test Title Test Author' })).not.toBeVisible()
+      await expect(page.getByRole('link', { name: 'Test Title by Test Author' })).not.toBeVisible()
     })
 
     test('user who did not create the blog cannot see the remove button', async ({ page }) => {
       await createBlog(page, 'Test Title', 'Test Author', 'Test URL')
       await page.getByText('logout').click()
       await loginUser(page, 'ouser', 'password')
-      await page.getByRole('link', { name: 'Test Title Test Author' }).click()
+      await page.getByRole('link', { name: 'Test Title by Test Author' }).click()
 
       await expect(page.getByRole('button', { name: 'delete'})).not.toBeVisible()
     })

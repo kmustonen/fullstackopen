@@ -30,10 +30,11 @@ describe('<Blog />', () => {
     })
 
     test('details are correctly shown', async () => {
-      screen.getByText('Test Title Test Name')
-      screen.getByText('likes: 67')
+      screen.getByText('Test Title')
+      screen.getByText('by Test Name')
+      screen.getByText('67 likes')
       screen.getByText('Test URL')
-      screen.getByText('Test Name')
+      screen.getByText('Added by Test Name')
       expect(screen.queryByText('like')).toBeNull()
       expect(screen.queryByText('delete')).toBeNull()
     })
@@ -63,10 +64,11 @@ describe('<Blog />', () => {
     })
 
     test('details are correctly shown', async () => {
-      screen.getByText('Test Title Test Name')
-      screen.getByText('likes: 67')
+      screen.getByText('Test Title')
+      screen.getByText('by Test Name')
+      screen.getByText('67 likes')
       screen.getByText('Test URL')
-      screen.getByText('Test Name')
+      screen.getByText('Added by Test Name')
       screen.getByText('like')
       screen.getByText('delete')
     })

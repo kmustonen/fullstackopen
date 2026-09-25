@@ -1,4 +1,4 @@
-import { Container, AppBar, Toolbar, Button, Typography } from '@mui/material'
+import { Container, AppBar, Toolbar, Button, Typography, Box } from '@mui/material'
 import { useState, useEffect } from 'react'
 
 import blogService from './services/blogs'
@@ -126,7 +126,7 @@ const App = () => {
     <Container>
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Typography variant="h6">blog app</Typography>
+          <Typography variant="h4">blog app</Typography>
           <div><Button color="inherit" component={Link} to="/" sx={style}>home</Button>
             {user && <Button color="inherit" component={Link} to="/create" sx={style}>new blog</Button>}
             {!user
@@ -136,31 +136,33 @@ const App = () => {
         </Toolbar>
       </AppBar>
       <Notification message={message.message} status={message.status} />
-      <Routes>
-        <Route path="/" element={
-          <BlogList
-            blogs={blogs}
-            user={user}/>
-        }/>
-        <Route path="/login" element={
-          user
-            ? <Navigate replace to="/" />
-            : <LoginForm handleLogin={handleLogin} />
-        }/>
-        <Route path="/create" element={
-          user
-            ? <BlogForm createBlog={createBlog} />
-            : <Navigate replace to="/"/>
-        }/>
-        <Route path="/blogs/:id" element={
-          <Blog
-            blog={blog}
-            user={user}
-            handleLike={handleLike}
-            handleRemove={handleRemove}
-          />
-        } />
-      </Routes>
+      <Box sx={{ p: 2 }}>
+        <Routes>
+          <Route path="/" element={
+            <BlogList
+              blogs={blogs}
+              user={user}/>
+          }/>
+          <Route path="/login" element={
+            user
+              ? <Navigate replace to="/" />
+              : <LoginForm handleLogin={handleLogin} />
+          }/>
+          <Route path="/create" element={
+            user
+              ? <BlogForm createBlog={createBlog} />
+              : <Navigate replace to="/"/>
+          }/>
+          <Route path="/blogs/:id" element={
+            <Blog
+              blog={blog}
+              user={user}
+              handleLike={handleLike}
+              handleRemove={handleRemove}
+            />
+          } />
+        </Routes>
+      </Box>
     </Container>
   )
 }
