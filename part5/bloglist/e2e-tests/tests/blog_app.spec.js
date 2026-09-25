@@ -1,5 +1,7 @@
 const { describe, beforeEach, test, expect } = require('@playwright/test')
 
+let token
+
 const loginUser = async (page, username, password) => {
   const textboxes = await page.getByRole('textbox').all()
   await textboxes[0].fill(username)
@@ -34,6 +36,11 @@ describe('Blog app', () => {
         password: 'password'
       }
     })
+
+    const loginResponse = await request.post('http://localhost:3003/api/login', {
+      data: { username: 'kmustonen', password: 'salasana' }
+    })
+    token = (await loginResponse.json()).token
 
     await page.goto('http://localhost:5173')
   })
@@ -100,5 +107,74 @@ describe('Blog app', () => {
       await expect(page.getByRole('button', { name: 'remove'})).not.toBeVisible()
     })
 
+    test.only('bloglist is ordered by likes', async ({ page, request }) => {
+      await expect(page.getByText('kmustonen logged in')).toBeVisible()
+
+      await request.post('http://localhost:3003/api/blogs', {
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        title: 'Test Title 1',
+        author: 'author',
+        url: 'url',
+        likes: 67
+      }
+      })
+
+      await request.post('http://localhost:3003/api/blogs', {
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        title: 'Test Title 2',
+        author: 'author',
+        url: 'url',
+        likes: 87
+      }
+      })
+
+      await request.post('http://localhost:3003/api/blogs', {
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        title: 'Test Title 3',
+        author: 'author',
+        url: 'url',
+        likes: 13
+      }
+      })
+
+      await request.post('http://localhost:3003/api/blogs', {
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        title: 'Test Title 4',
+        author: 'author',
+        url: 'url',
+        likes: 77
+      }
+      })
+
+      await request.post('http://localhost:3003/api/blogs', {
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        title: 'Test Title 5',
+        author: 'author',
+        url: 'url',
+        likes: 17
+      }
+      })
+
+      await page.reload()
+      await expect(page.getByText('kmustonen logged in')).toBeVisible()
+
+      const blogCount = 5
+      for (let i = 0; i < blogCount; i++) {
+        await page.getByRole('button', { name: 'view' }).first().click()
+      }
+      
+      const likes = page.getByText('likes:', {exact: false})
+      await expect(likes).toContainText([
+        'likes: 87',
+        'likes: 77',
+        'likes: 67',
+        'likes: 17',
+        'likes: 13'])
+    })
   })
 })
